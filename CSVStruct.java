@@ -8,6 +8,10 @@ public class CSVStruct {
     String weight;
     float cost;
 
+    /* Default constructor for a CSVStruct object
+     * @param
+     * @return void
+     */
     public CSVStruct(){
         brand = "";
         type = "";
@@ -23,6 +27,13 @@ public class CSVStruct {
         cost = 0;
     }
 
+    /* General set fucntion for assigning array data to CSVStruct properties.
+     * Note that this is specific to an array of data given by a particular
+     * layout of csv. Any other format other than brand,type,weight,cost will
+     * break this.
+     * @param String[] data, the array of data read from the csv file
+     * @return void
+     */
     public void set(String[] data){
         brand = data[0];
         type = data[1];
@@ -33,6 +44,12 @@ public class CSVStruct {
         shortName = brand + " " + weight;
     }
 
+    /* The following four functions are get functions. Note that these aren't
+     * really implemented properly since I didn't make the data private so they
+     * aren't really useful
+     * @param
+     * @return String, float
+     */
     public String getBrand(){
         return this.brand;
     }
@@ -49,6 +66,10 @@ public class CSVStruct {
         return this.cost;
     }
 
+    /* General print function for printing a CSVStruct object
+     * @param
+     * @return void
+     */
     public void printStruct(){
         System.out.println("CSV STRUCT");
         System.out.println("Brand: " + brand + " | Type: " + type + " | Weight: " + weight + " | Cost: " + cost);

@@ -1,5 +1,8 @@
+/* @file driver
+ * @author Marcus Bradlee
+ */
+
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class driver extends Service{
@@ -17,9 +20,6 @@ public class driver extends Service{
         System.out.println("LOADING SERVICES...");
 
         readConfig(config, services);
-//        for(int i = 0; i < services.size(); i++) {
-//            services.get(i).printService();
-//        }
 
         System.out.println();
         System.out.println("SERVICES LOADED");
@@ -32,11 +32,6 @@ public class driver extends Service{
         for(int j = 0; j < services.size(); j++){
             services.get(j).readCSV();
             services.get(j).sortList();
-//            services.get(j).printCSV();
-
-//            System.out.println();
-//            System.out.println("----------BREAK------------");
-//            System.out.println();
         }
 
         System.out.println();
@@ -54,6 +49,7 @@ public class driver extends Service{
         String itemSize;
         String search;
         int clientQuantity;
+        int clientItemCount = 0;
 
         while(true){
 
@@ -80,72 +76,56 @@ public class driver extends Service{
             }
 
             search = itemName + " " + itemSize;
-            int index = 0;
-            int invalidServices = services.size();
-            int invalidIndices[] = new int[invalidServices];
-            int serviceReset;
+            int index;
 
-            for(int p = 0; p < invalidServices; p++) {
-                invalidIndices[p] = -1;
-            }
+            for(int k = 0; k < services.size(); k++) {
 
-            for(int k = 0; k < services.size(); k++){
+                index = services.get(k).itemList.find(search, services.get(k).itemList, 0, services.get(k).itemList.size());
 
-                serviceReset = invalidServices;
-
-                if(services.get(k).valid){
-                    index = services.get(k).itemList.find(search, services.get(k).itemList, 0, services.get(k).itemList.size());
-                }
-                if(index == -1){
-                    //bug? price will be added to proceeding services?
-                    System.out.println("Couldn't find at: " + services.get(k).serviceName);
-                    invalidIndices[k] = k;
-                    invalidServices--;
-                    if(invalidServices == 0){
-                        System.out.println("Invalid item, enter again.");
-                        invalidServices = serviceReset;
-                        continue;
-                    }
+                if (index == -1) {
+                    System.out.println("Invalid item, enter again.");
+                    continue;
                 }else{
                     services.get(k).runningTotal += services.get(k).itemList.get(index).cost * clientQuantity;
                     System.out.println(services.get(k).serviceName + " new total: " + services.get(k).runningTotal);
-                }
-            }
-
-            for(int q = 0; q < invalidServices; q++){
-                if(invalidIndices[q] != -1){
-                    services.get(invalidIndices[q]).valid = false;
-                    invalidIndices[q] = -1;
+                    clientItemCount++;
                 }
             }
 
         }
 
         //[6] output final (best) price
-        float bestPrice = 0;
-        int bestIndex = 0;
-        int m = 0;
-        for(; m < services.size(); m++){
-            if(services.get(m).valid) {
+        if(clientItemCount > 0) {
+            float bestPrice = 0;
+            int bestIndex = 0;
+            int m = 0;
+            for (; m < services.size(); m++) {
                 bestIndex = m;
                 bestPrice = services.get(m).runningTotal + services.get(m).deliveryCost;
                 m++;
                 break;
             }
-        }
-        for(int n = m; n < services.size(); n++){
-            if(services.get(m).valid){
-                if(services.get(n).runningTotal + services.get(n).deliveryCost < bestPrice){
+            int n = m;
+            for (; n < services.size(); n++) {
+                if (services.get(n).runningTotal + services.get(n).deliveryCost < bestPrice) {
                     bestIndex = n;
                     bestPrice = services.get(n).runningTotal;
                 }
             }
+
+            System.out.println("The best delivery service for you is " + services.get(bestIndex).serviceName);
+            System.out.println("With a total cost of: $" + services.get(bestIndex).runningTotal + " plus a delivery fee of: $" + services.get(bestIndex).deliveryCost);
+        }else{
+            System.out.println("Your list was empty. Goodbye!");
         }
-
-        System.out.println("The best delivery service for you is " + services.get(bestIndex).serviceName);
-        System.out.println("With a total cost of: $" + services.get(bestIndex).runningTotal + " and a delivery fee of: $" + services.get(bestIndex).deliveryCost);
-
     }
+
+    /* readConfig is a function that receives the config file and loads each line into its own service item.
+     * After calling this function, all services provided by the config will have its own object stored inside
+     * an arrayList called services.
+     * @param File config, the file containing the initial service info, ArrayList<Service> services, the arrayList to be populated
+     * @return void
+     */
 
     public static void readConfig(File config, ArrayList<Service> services){
         try{

@@ -125,13 +125,16 @@ public class ArrayList<T> {
     }
 
     protected int find(String targetName, ArrayList<CSVStruct> a, int min, int max){
+
         int mid = (min + max) / 2;
-        if(min > max){
+
+        if(min > max || a.get(mid) == null){
             return -1;
         }
 
-        System.out.println("Looking for: " + targetName);
-        System.out.println("found: " + a.get(mid).fullName + ", " + a.get(mid).shortName);
+        if(a.get(mid) == null)
+            System.out.println("null pointer");
+
 
         if(a.get(mid).fullName.compareTo(targetName) == 0 || a.get(mid).shortName.compareTo(targetName) == 0){
             return mid;
@@ -139,6 +142,12 @@ public class ArrayList<T> {
             return find(targetName, a, mid+1, max);
         }else{
             return find(targetName, a, min, mid-1);
+        }
+    }
+
+    protected void clear(){
+        for(int i = 0; i < items; i++){
+            remove(i);
         }
     }
 
